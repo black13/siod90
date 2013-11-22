@@ -80,10 +80,8 @@ LISP sym_lambda = NIL;
 LISP sym_quote = NIL;
 LISP open_files = NIL;
 LISP unbound_marker = NIL;
-
-process_cla(argc,argv)
-int argc;
-char **argv;
+void close_open_files();
+process_cla(int argc,char **argv)
 {
     int k;
     for(k=1; k<argc; ++k)
@@ -108,35 +106,31 @@ char **argv;
     }
 }
 
-print_welcome()
+void print_welcome()
 {
     printf("Welcome to SIOD, Scheme In One Defun, Version 1.4\n");
     printf("(C) Copyright 1988, 1989 Paradigm Associates Inc.\n");
 }
 
-print_hs_1()
+void print_hs_1()
 {
     printf("heap_size = %ld cells, %ld bytes\n",
            heap_size,heap_size*sizeof(struct obj));
 }
 
-print_hs_2()
+void print_hs_2()
 {
     printf("heap_1 at 0x%lX, heap_2 at 0x%lX\n",heap_1,heap_2);
 }
 
 
-handle_sigfpe(sig,code,scp)
-long sig,code;
-struct sigcontext *scp;
+void handle_sigfpe(long sig,long code,struct sigcontext *scp)
 {
     signal(SIGFPE,handle_sigfpe);
     err("floating point exception",NIL);
 }
 
-handle_sigint(sig,code,scp)
-long sig,code;
-struct sigcontext *scp;
+void handle_sigint(long sig,long code,struct sigcontext *scp)
 {
     signal(SIGINT,handle_sigint);
     if (nointerrupt == 0) err("control-c interrupt",NIL);
@@ -200,7 +194,8 @@ void repl(void)
         }
         printf("> ");
         x = lread();
-        if EQ(x,eof_val) break;
+        if EQ(x,eof_val) 
+             break;
         rt = myruntime();
         cw = heap;
         x = leval(x,NIL);
@@ -285,8 +280,7 @@ LISP setcar(LISP cell,LISP  value)
     return(CAR(cell) = value);
 }
 
-LISP setcdr(cell,value)
-LISP cell, value;
+LISP setcdr(LISP cell,LISP value)
 {
     if NTYPEP(cell,tc_cons) err("wta to setcdr",cell);
     return(CDR(cell) = value);
@@ -330,16 +324,14 @@ LISP difference(LISP x,LISP y)
     return(flocons(FLONM(x)-FLONM(y)));
 }
 
-LISP quotient(x,y)
-LISP x,y;
+LISP quotient(LISP x,LISP y)
 {
     if NTYPEP(x,tc_flonum) err("wta(1st) to quotient",x);
     if NTYPEP(y,tc_flonum) err("wta(2nd) to quotient",y);
     return(flocons(FLONM(x)/FLONM(y)));
 }
 
-LISP greaterp(x,y)
-LISP x,y;
+LISP greaterp(LISP x,LISP y)
 {
     if NTYPEP(x,tc_flonum) err("wta(1st) to greaterp",x);
     if NTYPEP(y,tc_flonum) err("wta(2nd) to greaterp",y);
@@ -347,8 +339,7 @@ LISP x,y;
     return(NIL);
 }
 
-LISP lessp(x,y)
-LISP x,y;
+LISP lessp(LISP x,LISP y)
 {
     if NTYPEP(x,tc_flonum) err("wta(1st) to lessp",x);
     if NTYPEP(y,tc_flonum) err("wta(2nd) to lessp",y);
@@ -356,15 +347,13 @@ LISP x,y;
     return(NIL);
 }
 
-LISP eq(x,y)
-LISP x,y;
+LISP eq(LISP x,LISP y)
 {
     if EQ(x,y) return(truth);
     else return(NIL);
 }
 
-LISP eql(x,y)
-LISP x,y;
+LISP eql(LISP x,LISP y)
 {
     if EQ(x,y) return(truth);
     else if NTYPEP(x,tc_flonum) return(NIL);
@@ -373,9 +362,7 @@ LISP x,y;
     return(NIL);
 }
 
-LISP symcons(pname,vcell)
-char *pname;
-LISP vcell;
+LISP symcons(char *pname,LISP vcell)
 {
     LISP z;
     if ((z = heap) >= heap_end) err("ran out of storage",NIL);
@@ -387,15 +374,13 @@ LISP vcell;
     return(z);
 }
 
-LISP symbolp(x)
-LISP x;
+LISP symbolp(LISP x)
 {
     if TYPEP(x,tc_symbol) return(truth);
     else return(NIL);
 }
 
-LISP symbol_boundp(x,env)
-LISP x,env;
+LISP symbol_boundp(LISP x,LISP  env)
 {
     LISP tmp;
     if NTYPEP(x,tc_symbol) err("not a symbol",x);
@@ -425,7 +410,6 @@ LISP cintern_soft(char *name)
 }
 
 LISP cintern(char *name)
-
 {
     LISP sym;
     sym = cintern_soft(name);
@@ -995,8 +979,7 @@ LISP lread()
     return(lreadf(stdin));
 }
 
-int
-flush_ws(FILE *f,char *eoferr)
+int flush_ws(FILE *f,char *eoferr)
 {
     int c;
     while(1)
@@ -1110,7 +1093,7 @@ LISP oblistfn()
     return(copy_list(oblist));
 }
 
-close_open_files()
+void close_open_files()
 {
     LISP l;
     FILE *p;
@@ -1236,5 +1219,3 @@ init_subrs()
     init_subr("env-lookup",tc_subr_2,envlookup);
     init_subr("reverse",tc_subr_1,reverse);
 }
-
-
