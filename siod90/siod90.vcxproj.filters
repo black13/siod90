@@ -28,6 +28,11 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\siod.scm" />
+    <None Include="unit.scm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\siod.scm">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -51,12 +51,16 @@ Cambridge, MA 02138
 #include <setjmp.h>
 #include <signal.h>
 #include <math.h>
-#ifdef vms
 #include <stdlib.h>
-#endif
 
 #include "siod.h"
-
+/*
+#ifdef WIN32
+#pragma warning(disable : 4996)
+#pragma warning(disable : 4715)
+#pragma warning(disable : 4101)
+#endif
+*/
 LISP heap_1,heap_2;
 LISP heap,heap_end,heap_org;
 
@@ -81,7 +85,12 @@ LISP sym_quote = NIL;
 LISP open_files = NIL;
 LISP unbound_marker = NIL;
 void close_open_files();
-process_cla(int argc,char **argv)
+
+/*
+stdio.h:
+printf
+ */
+void process_cla(int argc,char **argv)
 {
     int k;
     for(k=1; k<argc; ++k)
@@ -178,7 +187,10 @@ double myruntime()
 #endif
 #endif
 
+/*
+stdio.h
 
+ */
 void repl(void)
 {
     LISP x,cw;
@@ -205,6 +217,10 @@ void repl(void)
     }
 }
 
+/*
+stdio.h
+printf
+ */
 void err(char *message,LISP x)
 {
     nointerrupt = 1;
@@ -418,7 +434,10 @@ LISP cintern(char *name)
     oblist = cons(sym,oblist);
     return(sym);
 }
-
+/*
+stdlib.h
+void * __cdecl malloc(_In_ size_t _Size);
+ */
 char * must_malloc(unsigned long size)
 {
     char *tmp;
@@ -427,6 +446,10 @@ char * must_malloc(unsigned long size)
     return(tmp);
 }
 
+/*
+string.h
+strcpy
+ */
 LISP rintern(char *name)
 {
     LISP sym;
@@ -623,7 +646,10 @@ void gc(void)
     errjmp_ok = 1;
     nointerrupt = 0;
 }
-
+/*
+stdio.h:
+printf
+ */
 LISP gc_status(LISP args)
 
 {
@@ -923,6 +949,10 @@ LISP lprint(LISP exp)
     return(NIL);
 }
 
+/*
+stdio.h:
+int __cdecl printf(_In_z_ _Printf_format_string_ const char * _Format, ...);
+ */
 LISP lprin1(LISP exp)
 {
     LISP tmp;
@@ -979,6 +1009,13 @@ LISP lread()
     return(lreadf(stdin));
 }
 
+/*
+stdio.h
+FILE*
+int __cdecl getc(_Inout_ FILE * _File);
+ctype.h
+ int __cdecl isspace(_In_ int _C);
+ */
 int flush_ws(FILE *f,char *eoferr)
 {
     int c;
@@ -992,6 +1029,14 @@ int flush_ws(FILE *f,char *eoferr)
     }
 }
 
+/*
+stdio.h
+FILE*
+int __cdecl ungetc(_In_ int _Ch, _Inout_ FILE * _File);
+ctype.h
+ int __cdecl isspace(_In_ int _C);
+ */
+
 LISP lreadf(FILE *f)
 {
     int c;
@@ -1000,7 +1045,11 @@ LISP lreadf(FILE *f)
     ungetc(c,f);
     return(lreadr(f));
 }
-
+/*
+stdio.h
+FILE*
+int __cdecl getc(_Inout_ FILE * _File);
+ */
 LISP lreadr(FILE *f)
 {
     int c,j;
@@ -1032,6 +1081,11 @@ LISP lreadr(FILE *f)
     err("token larger than TKBUFFERN",NIL);
 }
 
+/*
+stdio.h
+FILE*
+int __cdecl getc(_Inout_ FILE * _File);
+*/
 LISP lreadparen(FILE *f)
 {
     int c;
@@ -1045,7 +1099,7 @@ LISP lreadparen(FILE *f)
 
 LISP lreadtk(long j)
 {
-    int k;
+    //int k;
     char c,*p;
     p = tkbuffer;
     p[j] = 0;
@@ -1172,7 +1226,7 @@ long no_interrupt(long n)
     return(x);
 }
 
-init_subrs()
+void init_subrs()
 {
     init_subr("cons",tc_subr_2,cons);
     init_subr("car",tc_subr_1,car);

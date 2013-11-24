@@ -125,11 +125,13 @@ LISP vload(),load();
 LISP leval_tenv(),lerr(),quit(),nullp();
 LISP symbol_boundp(),symbol_value();
 LISP envlookup(),arglchk(),reverse();
-
-
+void process_cla(int argc,char **argv);
+void print_hs_1();
 struct gc_protected
-{LISP *location;
- struct gc_protected *next;};
+{
+     LISP *location;
+     struct gc_protected *next;
+};
 
 void gc_protect();
 
@@ -140,3 +142,4 @@ void init_subr();
 void repl(void);
 void err(char *message,LISP x);
 void gc(void);
+void print_welcome();

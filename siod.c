@@ -35,7 +35,7 @@ Cambridge, MA 02138
 #include <stdio.h>
 
 #include "siod.h"
-
+void our_subrs(void);
 /* This illustrates calling the main program entry points and enabling our
    own example subrs */
 
@@ -66,8 +66,7 @@ LISP my_two;
 	    (standard-fib (- x 2)))))
 */
 
-LISP cfib(x)
-LISP x;
+LISP cfib(LISP x)
 {
     if NNULLP(lessp(x,my_two))
         return(x);
@@ -105,7 +104,7 @@ LISP v;
 
 #endif
 
-our_subrs()
+void our_subrs(void)
 {
     my_one = flocons((double) 1.0);
     my_two = flocons((double) 2.0);
